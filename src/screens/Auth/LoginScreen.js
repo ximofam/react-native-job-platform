@@ -1,26 +1,36 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { loginStyles } from './Styles';
+import { loginApi } from '../../apis/services/authService';
+import UserContext from '../../contexts/userContext';
+import { getCurrentUserApi } from '../../apis/services/userService';
 
-export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+export default function LoginScreen({ navigation }) {
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { setUser } = useContext(UserContext);
 
-  const handleLogin = () => {
-    console.log({ email, password });
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      await loginApi({
+        username: usernameOrEmail,
+        password,
+      });
+
+      const currentUser = await getCurrentUserApi();
+      await setUser(currentUser);
+
+      navigation.replace('Home');
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,7 +66,7 @@ export default function LoginScreen() {
               <View style={loginStyles.card}>
                 {/* Email */}
                 <View style={loginStyles.inputWrapper}>
-                  <Text style={loginStyles.label}>Email</Text>
+                  <Text style={loginStyles.label}>Username or email</Text>
 
                   <View style={loginStyles.inputContainer}>
                     <Ionicons
@@ -66,11 +76,10 @@ export default function LoginScreen() {
                     />
 
                     <TextInput
-                      placeholder="Enter your email"
+                      placeholder="Username or email"
                       placeholderTextColor="#94A3B8"
-                      value={email}
-                      onChangeText={setEmail}
-                      keyboardType="email-address"
+                      value={usernameOrEmail}
+                      onChangeText={setUsernameOrEmail}
                       autoCapitalize="none"
                       style={loginStyles.input}
                     />
@@ -120,14 +129,30 @@ export default function LoginScreen() {
                 <TouchableOpacity
                   activeOpacity={0.85}
                   onPress={handleLogin}
+                  disabled={loading}
                 >
                   <LinearGradient
                     colors={['#2563EB', '#3B82F6']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
-                    style={loginStyles.loginButton}
+                    style={[
+                      loginStyles.loginButton,
+
+                      loading && {
+                        opacity: 0.7,
+                      },
+                    ]}
                   >
-                    <Text style={loginStyles.loginButtonText}>Login</Text>
+                    {loading ? (
+                      <ActivityIndicator
+                        color="#FFFFFF"
+                        size="small"
+                      />
+                    ) : (
+                      <Text style={loginStyles.loginButtonText}>
+                        Login
+                      </Text>
+                    )}
                   </LinearGradient>
                 </TouchableOpacity>
 
@@ -153,7 +178,7 @@ export default function LoginScreen() {
                     Don't have an account?
                   </Text>
 
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                     <Text style={loginStyles.registerLink}> Sign Up</Text>
                   </TouchableOpacity>
                 </View>

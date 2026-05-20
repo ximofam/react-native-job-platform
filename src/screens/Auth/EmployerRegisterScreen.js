@@ -1,23 +1,34 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, StatusBar, KeyboardAvoidingView, Platform, ScrollView, } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { employerRegisterStyles } from './Styles';
+import CompanyLocationItem from './components/CompanyLocationItem';
+import SelectBox from './components/SelectBox';
+import { registerEmployerApi } from '../../apis/services/authService';
 
-const genders = ['MALE', 'FEMALE'];
-const companyTypes = ['PRODUCT', 'OUTSOURCE', 'STARTUP', 'AGENCY', 'FOREIGN', 'STATE_OWNED', 'OTHER'];
-const employeeSizes = ['SMALL', 'MEDIUM', 'LARGE', 'VERY_LARGE', 'ENTERPRISE'];
+const genderOptions = [
+  { label: 'Nam', value: 'MALE' },
+  { label: 'Nữ', value: 'FEMALE' },
+];
 
+const companyTypeOptions = [
+  { label: 'Product', value: 'PRODUCT' },
+  { label: 'Outsource', value: 'OUTSOURCE' },
+  { label: 'Startup', value: 'STARTUP' },
+  { label: 'Agency', value: 'AGENCY' },
+  { label: 'Công ty nước ngoài', value: 'FOREIGN' },
+  { label: 'Doanh nghiệp nhà nước', value: 'STATE_OWNED' },
+  { label: 'Khác', value: 'OTHER' },
+];
+
+const employeeSizeOptions = [
+  { label: 'Nhỏ', value: 'SMALL' },
+  { label: 'Trung bình', value: 'MEDIUM' },
+  { label: 'Lớn', value: 'LARGE' },
+  { label: 'Rất lớn', value: 'VERY_LARGE' },
+  { label: 'Tập đoàn', value: 'ENTERPRISE' },
+];
 export default function EmployerRegisterScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -44,6 +55,52 @@ export default function EmployerRegisterScreen({ navigation }) {
     },
   });
 
+  const addLocation = () => {
+    setForm((prev) => ({
+      ...prev,
+      company: {
+        ...prev.company,
+        new_locations: [
+          ...prev.company.new_locations,
+          {
+            label: 'BRANCH',
+            is_primary: false,
+            address_street: '',
+            city: null,
+            district: null,
+          },
+        ],
+      },
+    }));
+  };
+
+  const removeLocation = (index) => {
+    setForm((prev) => ({
+      ...prev,
+      company: {
+        ...prev.company,
+        new_locations:
+          prev.company.new_locations.filter(
+            (_, i) => i !== index
+          ),
+      },
+    }));
+  };
+
+  const updateLocation = (index, value) => {
+    setForm((prev) => ({
+      ...prev,
+      company: {
+        ...prev.company,
+        new_locations:
+          prev.company.new_locations.map(
+            (item, i) =>
+              i === index ? value : item
+          ),
+      },
+    }));
+  };
+
   const updateField = (field, value) => {
     setForm((prev) => ({
       ...prev,
@@ -61,23 +118,36 @@ export default function EmployerRegisterScreen({ navigation }) {
     }));
   };
 
-  const updateLocationField = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      company: {
-        ...prev.company,
-        new_locations: [
-          {
-            ...prev.company.new_locations[0],
-            [field]: value,
-          },
-        ],
-      },
-    }));
-  };
 
-  const handleRegister = () => {
-    console.log(JSON.stringify(form, null, 2));
+  const handleRegister = async () => {
+    try {
+      const payload = {
+        ...form,
+        company: {
+          ...form.company,
+          new_locations: form.company.new_locations.map((location) => ({
+            label: location.label,
+            is_primary: location.is_primary,
+            address_street: location.address_street,
+            district: Number(location.district.id),
+          })),
+        },
+      };
+      console.log('REGISTER DATA:', payload);
+      const response = await registerEmployerApi(payload);
+      console.log('REGISTER SUCCESS:', response.data);
+      alert('Đăng ký tài khoản thành công');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.log('REGISTER ERROR:', error);
+
+      if (error.response?.data) {
+        console.log(error.response.data);
+        alert(error.response.data.detail || 'Đăng ký thất bại');
+      } else {
+        alert('Không thể kết nối đến server');
+      }
+    }
   };
 
   return (
@@ -198,33 +268,18 @@ export default function EmployerRegisterScreen({ navigation }) {
 
                 {/* Gender */}
                 <View style={employerRegisterStyles.inputWrapper}>
-                  <Text style={employerRegisterStyles.label}>Gender</Text>
+                  <Text style={employerRegisterStyles.label}>
+                    Giới tính
+                  </Text>
 
-                  <View style={employerRegisterStyles.rowContainer}>
-                    {genders.map((gender) => {
-                      const active = form.gender === gender;
-
-                      return (
-                        <TouchableOpacity
-                          key={gender}
-                          style={[
-                            employerRegisterStyles.optionButton,
-                            active && employerRegisterStyles.optionButtonActive,
-                          ]}
-                          onPress={() => updateField('gender', gender)}
-                        >
-                          <Text
-                            style={[
-                              employerRegisterStyles.optionText,
-                              active && employerRegisterStyles.optionTextActive,
-                            ]}
-                          >
-                            {gender}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <SelectBox
+                    icon="male-female-outline"
+                    value={form.gender}
+                    onChange={(value) =>
+                      updateField('gender', value)
+                    }
+                    items={genderOptions}
+                  />
                 </View>
 
                 {/* Company Section */}
@@ -255,69 +310,34 @@ export default function EmployerRegisterScreen({ navigation }) {
 
                 {/* Company Type */}
                 <View style={employerRegisterStyles.inputWrapper}>
-                  <Text style={employerRegisterStyles.label}>Company Type</Text>
+                  <Text style={employerRegisterStyles.label}>
+                    Loại công ty
+                  </Text>
 
-                  <View style={employerRegisterStyles.rowWrapContainer}>
-                    {companyTypes.map((type) => {
-                      const active = form.company.type === type;
-
-                      return (
-                        <TouchableOpacity
-                          key={type}
-                          style={[
-                            employerRegisterStyles.tagButton,
-                            active && employerRegisterStyles.tagButtonActive,
-                          ]}
-                          onPress={() =>
-                            updateCompanyField('type', type)
-                          }
-                        >
-                          <Text
-                            style={[
-                              employerRegisterStyles.tagText,
-                              active && employerRegisterStyles.tagTextActive,
-                            ]}
-                          >
-                            {type}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <SelectBox
+                    icon="business-outline"
+                    value={form.company.type}
+                    onChange={(value) =>
+                      updateCompanyField('type', value)
+                    }
+                    items={companyTypeOptions}
+                  />
                 </View>
 
                 {/* Employee Size */}
                 <View style={employerRegisterStyles.inputWrapper}>
-                  <Text style={employerRegisterStyles.label}>Employee Size</Text>
+                  <Text style={employerRegisterStyles.label}>
+                    Quy mô công ty
+                  </Text>
 
-                  <View style={employerRegisterStyles.rowWrapContainer}>
-                    {employeeSizes.map((size) => {
-                      const active =
-                        form.company.employee_size === size;
-
-                      return (
-                        <TouchableOpacity
-                          key={size}
-                          style={[
-                            employerRegisterStyles.tagButton,
-                            active && employerRegisterStyles.tagButtonActive,
-                          ]}
-                          onPress={() =>
-                            updateCompanyField('employee_size', size)
-                          }
-                        >
-                          <Text
-                            style={[
-                              employerRegisterStyles.tagText,
-                              active && employerRegisterStyles.tagTextActive,
-                            ]}
-                          >
-                            {size}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <SelectBox
+                    icon="people-outline"
+                    value={form.company.employee_size}
+                    onChange={(value) =>
+                      updateCompanyField('employee_size', value)
+                    }
+                    items={employeeSizeOptions}
+                  />
                 </View>
 
                 {/* Tax Code */}
@@ -355,63 +375,52 @@ export default function EmployerRegisterScreen({ navigation }) {
                       numberOfLines={5}
                       textAlignVertical="top"
                       value={form.company.description}
-                      onChangeText={(value) =>
-                        updateCompanyField('description', value)
-                      }
+                      onChangeText={(value) => updateCompanyField('description', value)}
                       style={employerRegisterStyles.textArea}
                     />
                   </View>
                 </View>
 
                 {/* Location */}
-                <Text style={employerRegisterStyles.sectionTitle}>Headquarters</Text>
+                <Text style={employerRegisterStyles.sectionTitle}>
+                  Company Locations
+                </Text>
 
-                <View style={employerRegisterStyles.inputWrapper}>
-                  <Text style={employerRegisterStyles.label}>Street Address</Text>
-
-                  <View style={employerRegisterStyles.inputContainer}>
-                    <Ionicons
-                      name="location-outline"
-                      size={20}
-                      color="#64748B"
-                    />
-
-                    <TextInput
-                      placeholder="Enter street address"
-                      placeholderTextColor="#94A3B8"
-                      value={form.company.new_locations[0].address_street}
-                      onChangeText={(value) =>
-                        updateLocationField('address_street', value)
+                {form.company.new_locations.map(
+                  (location, index) => (
+                    <CompanyLocationItem
+                      key={index}
+                      styles={employerRegisterStyles}
+                      value={location}
+                      removable={index > 0}
+                      onRemove={() => removeLocation(index)}
+                      onChange={(value) =>
+                        updateLocation(index, value)
                       }
-                      style={employerRegisterStyles.input}
                     />
-                  </View>
-                </View>
+                  )
+                )}
 
-                <View style={employerRegisterStyles.inputWrapper}>
-                  <Text style={employerRegisterStyles.label}>District ID</Text>
-
-                  <View style={employerRegisterStyles.inputContainer}>
-                    <Ionicons
-                      name="map-outline"
-                      size={20}
-                      color="#64748B"
-                    />
-
-                    <TextInput
-                      placeholder="Enter district id"
-                      placeholderTextColor="#94A3B8"
-                      keyboardType="numeric"
-                      value={String(
-                        form.company.new_locations[0].district
-                      )}
-                      onChangeText={(value) =>
-                        updateLocationField('district', value)
-                      }
-                      style={employerRegisterStyles.input}
-                    />
-                  </View>
-                </View>
+                <TouchableOpacity
+                  onPress={addLocation}
+                  style={{
+                    marginBottom: 24,
+                    paddingVertical: 14,
+                    borderRadius: 14,
+                    borderWidth: 1,
+                    borderColor: '#3B82F6',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: '#3B82F6',
+                      fontWeight: '700',
+                    }}
+                  >
+                    + Add Branch Location
+                  </Text>
+                </TouchableOpacity>
 
                 {/* Register Button */}
                 <TouchableOpacity

@@ -366,4 +366,42 @@ export const employerRegisterStyles = StyleSheet.create({
   tagTextActive: {
     color: '#1D4ED8',
   },
+
+  selectContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#334155',
+    backgroundColor: '#0F172A',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    minHeight: 56,
+  },
 });
+
+export const pickerSelectStyles = {
+  inputIOS: {
+    color: '#FFFFFF',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    fontSize: 15,
+    flex: 1,
+  },
+
+  inputAndroid: {
+    color: '#FFFFFF',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    fontSize: 15,
+    flex: 1,
+  },
+
+  placeholder: {
+    color: '#94A3B8',
+  },
+
+  iconContainer: {
+    top: 16,
+    right: 12,
+  },
+};
