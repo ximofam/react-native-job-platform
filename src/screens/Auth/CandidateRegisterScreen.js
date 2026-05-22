@@ -1,53 +1,56 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, SafeAreaView, StatusBar, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { candidateRegisterStyles } from './Styles';
+import SelectBox from './components/SelectBox';
+import { getCountriesApi } from '../../apis/services/locationService';
+import { registerCandidateApi } from '../../apis/services/authService';
+import useForm from '../../hooks/useForm';
 
-const genders = ['MALE', 'FEMALE', 'OTHER'];
-const countries = [
-  { id: 1, name: 'Vietnam' },
-  { id: 2, name: 'United States' },
-  { id: 3, name: 'Japan' },
-  { id: 4, name: 'Singapore' },
+const genderOptions = [
+  { label: 'Nam', value: 'MALE' },
+  { label: 'Nữ', value: 'FEMALE' },
 ];
 
-export default function CandidateRegisterScreen() {
-  const [form, setForm] = useState({
+export default function CandidateRegisterScreen({ navigation }) {
+  const { form, errors, updateField, setServerErrors, } = useForm({
     username: '',
     email: '',
     password: '',
     gender: 'MALE',
     country: 1,
   });
-
+  const [countries, setCountries] = useState([])
   const [showPassword, setShowPassword] = useState(false);
 
-  const updateField = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  useEffect(() => {
+    fetchCountries();
+  }, [])
+
+  const fetchCountries = async () => {
+    try {
+      const res = await getCountriesApi();
+      setCountries(res);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleRegister = () => {
-    console.log(form);
+  const handleRegister = async () => {
+    try {
+      const res = await registerCandidateApi(form)
+      alert('Đăng ký tài khoản thành công');
+      navigation.navigate('Login');
+    } catch (error) {
+      setServerErrors(error);
+      console.log(errors)
+    }
   };
 
   return (
     <>
       <StatusBar barStyle="light-content" />
-
       <LinearGradient
         colors={['#020617', '#0F172A', '#1E293B']}
         style={candidateRegisterStyles.container}
@@ -159,67 +162,29 @@ export default function CandidateRegisterScreen() {
 
                 {/* Gender */}
                 <View style={candidateRegisterStyles.inputWrapper}>
-                  <Text style={candidateRegisterStyles.label}>Gender</Text>
-
-                  <View style={candidateRegisterStyles.genderContainer}>
-                    {genders.map((gender) => {
-                      const active = form.gender === gender;
-
-                      return (
-                        <TouchableOpacity
-                          key={gender}
-                          activeOpacity={0.85}
-                          style={[
-                            candidateRegisterStyles.genderButton,
-                            active && candidateRegisterStyles.genderButtonActive,
-                          ]}
-                          onPress={() => updateField('gender', gender)}
-                        >
-                          <Text
-                            style={[
-                              candidateRegisterStyles.genderText,
-                              active && candidateRegisterStyles.genderTextActive,
-                            ]}
-                          >
-                            {gender}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <Text style={candidateRegisterStyles.label}>Giới tính</Text>
+                  <SelectBox
+                    icon="male-female-outline"
+                    value={form.gender}
+                    onChange={(value) =>
+                      updateField('gender', value)
+                    }
+                    items={genderOptions}
+                  />
                 </View>
 
                 {/* Country */}
                 <View style={candidateRegisterStyles.inputWrapper}>
                   <Text style={candidateRegisterStyles.label}>Country</Text>
-
-                  <View style={candidateRegisterStyles.countryList}>
-                    {countries.map((country) => {
-                      const active = form.country === country.id;
-
-                      return (
-                        <TouchableOpacity
-                          key={country.id}
-                          style={[
-                            candidateRegisterStyles.countryItem,
-                            active && candidateRegisterStyles.countryItemActive,
-                          ]}
-                          onPress={() =>
-                            updateField('country', country.id)
-                          }
-                        >
-                          <Text
-                            style={[
-                              candidateRegisterStyles.countryText,
-                              active && candidateRegisterStyles.countryTextActive,
-                            ]}
-                          >
-                            {country.name}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <SelectBox
+                    icon="earth-outline"
+                    value={form.country}
+                    onChange={(value) => updateField('country', value)}
+                    items={countries.map(country => ({
+                      label: country.name,
+                      value: country.id,
+                    }))}
+                  />
                 </View>
 
                 {/* Register Button */}

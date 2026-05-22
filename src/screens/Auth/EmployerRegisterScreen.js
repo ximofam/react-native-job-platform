@@ -6,6 +6,7 @@ import { employerRegisterStyles } from './Styles';
 import CompanyLocationItem from './components/CompanyLocationItem';
 import SelectBox from './components/SelectBox';
 import { registerEmployerApi } from '../../apis/services/authService';
+import useForm from '../../hooks/useForm';
 
 const genderOptions = [
   { label: 'Nam', value: 'MALE' },
@@ -31,8 +32,7 @@ const employeeSizeOptions = [
 ];
 export default function EmployerRegisterScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
-
-  const [form, setForm] = useState({
+  const { form, errors, updateField, setServerErrors, } = useForm({
     username: '',
     email: '',
     password: '',
@@ -53,7 +53,7 @@ export default function EmployerRegisterScreen({ navigation }) {
         },
       ],
     },
-  });
+  })
 
   const addLocation = () => {
     setForm((prev) => ({
@@ -101,13 +101,6 @@ export default function EmployerRegisterScreen({ navigation }) {
     }));
   };
 
-  const updateField = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const updateCompanyField = (field, value) => {
     setForm((prev) => ({
       ...prev,
@@ -133,20 +126,13 @@ export default function EmployerRegisterScreen({ navigation }) {
           })),
         },
       };
-      console.log('REGISTER DATA:', payload);
-      const response = await registerEmployerApi(payload);
-      console.log('REGISTER SUCCESS:', response.data);
+
+      await registerEmployerApi(payload);
       alert('Đăng ký tài khoản thành công');
       navigation.navigate('Login');
     } catch (error) {
       console.log('REGISTER ERROR:', error);
-
-      if (error.response?.data) {
-        console.log(error.response.data);
-        alert(error.response.data.detail || 'Đăng ký thất bại');
-      } else {
-        alert('Không thể kết nối đến server');
-      }
+      setServerErrors(error)
     }
   };
 
@@ -268,9 +254,7 @@ export default function EmployerRegisterScreen({ navigation }) {
 
                 {/* Gender */}
                 <View style={employerRegisterStyles.inputWrapper}>
-                  <Text style={employerRegisterStyles.label}>
-                    Giới tính
-                  </Text>
+                  <Text style={employerRegisterStyles.label}>Giới tính</Text>
 
                   <SelectBox
                     icon="male-female-outline"

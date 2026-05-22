@@ -1,18 +1,13 @@
 import React, { useContext } from 'react';
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-} from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import UserContext from '../../contexts/userContext';
 import s from './styles/profileStyles';
+import * as DocumentPicker from 'expo-document-picker';
+import { uploadCvApi } from '../../apis/services/userService';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+
 function SectionCard({ icon, iconColor, iconBg, title, onEdit, children }) {
   return (
     <View style={s.card}>
@@ -48,14 +43,41 @@ function TimelineItem({ title, sub, period, isLast }) {
   );
 }
 
-// ── Main Screen ───────────────────────────────────────────────────────────────
+
 export default function ProfileScreen() {
-  const { user, logout } = useContext(UserContext);
+  const { user, logout, updateUser } = useContext(UserContext);
 
   const fullName = `${user.first_name} ${user.last_name}`;
   const bio = user.profile?.bio;
   const educations = user.profile?.educations ?? [];
   const experiences = user.profile?.experiences ?? [];
+
+  const handleUploadCv = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'application/pdf',
+        copyToCacheDirectory: true,
+      });
+
+      if (result.canceled) return;
+
+      const file = result.assets[0];
+
+      const formData = new FormData();
+      formData.append('title', file.name);
+      formData.append('file', {
+        uri: file.uri,
+        name: file.name,
+        type: 'application/pdf',
+      });
+
+      await uploadCvApi(formData);
+      console.log('Upload success');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   return (
     <LinearGradient colors={['#020617', '#0F172A', '#111827']} style={s.container}>
@@ -88,6 +110,14 @@ export default function ProfileScreen() {
 
             <Text style={s.profileName}>{fullName}</Text>
             <Text style={s.profileEmail}>{user.email}</Text>
+            <TouchableOpacity style={s.uploadCvBtn} onPress={handleUploadCv}>
+              <Ionicons
+                name="document-attach-outline"
+                size={18}
+                color="#e61717"
+              />
+              <Text style={s.uploadCvText}>Upload CV</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Body */}
@@ -140,8 +170,7 @@ export default function ProfileScreen() {
               onEdit={() => { }}
             >
               {experiences.length === 0 ? (
-                <Text style={s.cardEmpty}>Chưa có kinh nghiệm làm việc.</Text>
-              ) : (
+                <Text style={s.cardEmpty}>Chưa có kinh nghiệm làm việc.</Text>) : (
                 experiences.map((exp, index) => (
                   <TimelineItem
                     key={index}

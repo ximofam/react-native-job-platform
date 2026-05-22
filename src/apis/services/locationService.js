@@ -9,5 +9,5 @@ export const getDistrictsApi = async (cityId) => {
 };
 
 export const getCountriesApi = async () => {
-  return publicAxios.get('/countries/')
+  return publicAxios.get('/countries/');
 }
