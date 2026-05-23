@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, } from 'react-native';
 import { Ionicons, } from '@expo/vector-icons';
-import s from '../styles/jobSearchStyles';
+import s from '../styles/candidateScreenStyles';
 import { useNavigation } from '@react-navigation/native';
 
 export default function JobCard({ job, onToggleSave }) {
@@ -12,27 +12,17 @@ export default function JobCard({ job, onToggleSave }) {
     <View style={s.jobCard}>
       <View style={s.jobCardTop}>
         {company.logo_url ? (
-          <Image
-            source={{
-              uri: company.logo_url,
-            }}
-            style={s.companyLogoImg}
-          />
+          <Image source={{ uri: company.logo_url }} style={s.companyLogoImg} />
         ) : (
           <View style={s.companyLogo}>
-            <Text
-              style={s.companyLogoText}
-            >
+            <Text style={s.companyLogoText}>
               {getInitial(company.name)}
             </Text>
           </View>
         )}
 
         <View style={s.jobInfo}>
-          <Text
-            style={s.jobTitle}
-            numberOfLines={2}
-          >
+          <Text style={s.jobTitle} numberOfLines={2}>
             {job.title}
           </Text>
 
@@ -41,12 +31,7 @@ export default function JobCard({ job, onToggleSave }) {
           </Text>
         </View>
 
-        <TouchableOpacity
-          style={s.bookmarkBtn}
-          onPress={() =>
-            onToggleSave(job.id)
-          }
-        >
+        <TouchableOpacity style={s.bookmarkBtn} onPress={() => onToggleSave(job.id)}>
           <Ionicons
             name={job.saved ? 'bookmark' : 'bookmark-outline'}
             size={20}
@@ -67,7 +52,7 @@ export default function JobCard({ job, onToggleSave }) {
           {formatSalary(job.salary)}
         </Text>
 
-        <TouchableOpacity style={s.applyBtn} onPress={() => navigation.navigate("JobDetail")}>
+        <TouchableOpacity style={s.applyBtn} onPress={() => navigation.navigate("JobDetail", { id: job.id })}>
           <Text style={s.applyBtnText}>Xem chi tiết</Text>
         </TouchableOpacity>
       </View>

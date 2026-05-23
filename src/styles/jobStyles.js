@@ -185,4 +185,156 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+
+  scrollContainer: {
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+  },
+
+  searchWrapper: {
+    marginBottom: 10,
+  },
+
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    height: 56,
+  },
+
+  searchInput: {
+    flex: 1,
+    marginLeft: 10,
+    color: '#0F172A',
+    fontSize: 15,
+  },
+
+  searchBtn: {
+    backgroundColor: '#2563EB',
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    marginLeft: 10,
+  },
+
+  searchBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+
+  locationRow: {
+    marginBottom: 10,
+  },
+
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 20,
+  },
+
+  chip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+
+  chipActive: {
+    backgroundColor: '#2563EB',
+  },
+
+  chipText: {
+    color: '#94A3B8',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  chipTextActive: {
+    color: '#FFFFFF',
+  },
+
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+  },
+
+  loadingText: {
+    color: '#64748B',
+    fontSize: 14,
+  },
+
+  emptyContainer: {
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingHorizontal: 32,
+  },
+
+  emptyIconWrapper: {
+    width: 96,
+    height: 96,
+    borderRadius: 32,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+
+  emptyTitle: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+
+  emptySub: {
+    color: '#64748B',
+    fontSize: 14,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+
+  resultCount: {
+    color: '#64748B',
+    fontSize: 13,
+    marginBottom: 16,
+  },
+
+  loadMoreWrapper: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+
+  loadMoreBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginVertical: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(59,130,246,0.1)',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(59,130,246,0.3)',
+    alignSelf: 'center',
+  },
+
+  loadMoreText: {
+    color: '#3B82F6',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
+  endText: {
+    color: '#475569',
+    fontSize: 13,
+    textAlign: 'center',
+    paddingVertical: 20,
+  },
 });

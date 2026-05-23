@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View } from "react-native";
-import s from '../styles/postJobStyles';
+import s from '../../../styles/employerScreenStyles';
 
 export default function TagSelector({ options, value, onChange }) {
   return (

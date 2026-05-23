@@ -1,8 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
-import s from '../styles/postJobStyles';
-import { COLORS } from '../styles/common';
+import s, { COLORS } from '../../../styles/employerScreenStyles';
 
 export default function StepIndicator({ current, steps }) {
   return (

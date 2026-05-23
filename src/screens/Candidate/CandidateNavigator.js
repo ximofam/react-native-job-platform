@@ -1,9 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import JobSearchScreen from './JobSearchScreen';
+import JobSearchScreen from '../Job/JobSearchScreen';
 import ProfileScreen from './ProfileScreen';
 import { TouchableOpacity, View } from 'react-native';
+import CandidateApplicationScreen from './ApplicationScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -11,31 +12,13 @@ export default function CandidateNavigator() {
   return (
     <Tab.Navigator
       screenOptions={({ route, navigation }) => ({
-        headerStyle: {
-          backgroundColor: '#020617',
-        },
-
+        headerStyle: { backgroundColor: '#020617' },
         headerTintColor: '#FFFFFF',
-
-        headerTitleStyle: {
-          fontWeight: '700',
-        },
-
+        headerTitleStyle: { fontWeight: '700' },
         headerRight: () => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Notifications')}
-            style={{
-              marginRight: 18,
-            }}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={{ marginRight: 18, }}          >
             <View>
-              <Ionicons
-                name="notifications-outline"
-                size={24}
-                color="#FFFFFF"
-              />
-
-              {/* Badge */}
+              <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
               <View
                 style={{
                   position: 'absolute',
@@ -59,19 +42,13 @@ export default function CandidateNavigator() {
           paddingBottom: 10,
           paddingTop: 8,
         },
-
         tabBarActiveTintColor: '#3B82F6',
         tabBarInactiveTintColor: '#475569',
-
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-        },
-
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
         tabBarIcon: ({ focused, color }) => {
           const icons = {
             Search: focused ? 'search' : 'search-outline',
-            Saved: focused ? 'bookmark' : 'bookmark-outline',
+            Application: focused ? 'documents' : 'documents-outline',
             Profile: focused ? 'person' : 'person-outline',
           };
 
@@ -80,6 +57,7 @@ export default function CandidateNavigator() {
       })}
     >
       <Tab.Screen name="Search" component={JobSearchScreen} options={{ tabBarLabel: 'Tìm việc' }} />
+      <Tab.Screen name="Application" component={CandidateApplicationScreen} options={{ tabBarLabel: 'Hồ sơ ứng tuyển' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Hồ sơ' }} />
     </Tab.Navigator>
   );

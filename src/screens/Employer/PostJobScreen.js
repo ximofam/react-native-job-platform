@@ -2,15 +2,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import common, { COLORS } from './styles/common';
-import s from './styles/postJobStyles';
+import s, { COLORS } from '../../styles/employerScreenStyles';
 import { getCitiesApi, getDistrictsApi } from '../../apis/services/locationService';
 import PackageCard from './components/PackageCard';
 import StepIndicator from './components/StepIndicator';
 import TagSelector from './components/TagSelector';
 import DropdownModal from './components/DropdownModal';
 import SelectBtn from './components/SelectBtn';
-import { getCategoriesApi, postJobApi, publishJobApi } from '../../apis/services/jobService';
+import { getCategoriesApi, postJobApi, publishJobApi, publishPriorityJobApi } from '../../apis/services/jobService';
+import PayButton from '../../components/PayButton';
 
 const EMPLOYMENT_TYPES = [
   { value: 'FULL_TIME', label: 'Toàn thời gian' },
@@ -107,23 +107,22 @@ export default function PostJobScreen({ user }) {
   const [submitting, setSubmitting] = useState(false);
   const [publishedJob, setPublishedJob] = useState(null);
 
+  const [stripeClientSecret, setStripeClientSecret] = useState(null);
+
   const update = useCallback((field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  // Load danh mục 1 lần khi ở step 0
   useEffect(() => {
     if (step === 0 && categories.length === 0) {
       setLoadingCategories(true);
       getCategoriesApi()
         .then((data) => {
-          // Làm phẳng (flatten) dữ liệu cây thành 1 cấp
           const flatCategories = [];
           data.forEach(parent => {
             flatCategories.push({ id: parent.id, name: parent.name });
             if (parent.children && parent.children.length > 0) {
               parent.children.forEach(child => {
-                // Thêm dấu gạch ngang để biểu diễn mục con, nhưng list vẫn là 1 chiều
                 flatCategories.push({ id: child.id, name: `— ${child.name}` });
               });
             }
@@ -135,7 +134,7 @@ export default function PostJobScreen({ user }) {
     }
   }, [step]);
 
-  // Load cities once when reaching step 2
+
   useEffect(() => {
     if (step === 2 && cities.length === 0) {
       setLoadingCities(true);
@@ -155,7 +154,7 @@ export default function PostJobScreen({ user }) {
       .finally(() => setLoadingDistricts(false));
   };
 
-  // ── Build API payload ────────────────────────────────
+
   const buildPayload = () => {
     const address =
       form.addressMode === 'company'
@@ -167,7 +166,7 @@ export default function PostJobScreen({ user }) {
         };
 
     return {
-      category: form.category?.id ?? null, // Gửi ID của category
+      category: form.category?.id ?? null,
       address,
       employment_type: form.employment_type,
       experience_level: form.experience_level,
@@ -181,15 +180,20 @@ export default function PostJobScreen({ user }) {
     };
   };
 
-  // ── Submit: POST draft → publish ─────────────────────
+
   const handlePublish = async () => {
     setSubmitting(true);
     try {
-      const payload = buildPayload()
-      console.log(payload)
+      const payload = buildPayload();
       const draft = await postJobApi(payload);
-      const published = await publishJobApi(draft.id, selectedPackage);
-      setPublishedJob(published);
+
+      if (selectedPackage === 'FREE') {
+        const published = await publishJobApi(draft.id, selectedPackage);
+        setPublishedJob(published);
+      } else {
+        const res = await publishPriorityJobApi(draft.id, 'STRIPE');
+        setStripeClientSecret(res.client_secret);
+      }
     } catch (err) {
       console.error('Publish error:', err);
     } finally {
@@ -197,11 +201,47 @@ export default function PostJobScreen({ user }) {
     }
   };
 
-  // ── Success screen ───────────────────────────────────
+  if (stripeClientSecret) {
+    return (
+      <LinearGradient colors={['#060813', '#0C0F1E', '#111527']} style={s.container}>
+        <SafeAreaView style={[s.safeArea, { justifyContent: 'center', paddingHorizontal: 24 }]}>
+          <Text style={s.successTitle}>Hoàn tất thanh toán</Text>
+          <Text style={[s.pageSubtitle, { textAlign: 'center', marginBottom: 32 }]}>
+            Xác nhận thanh toán để kích hoạt{'\n'}
+            <Text style={{ color: COLORS.amber, fontWeight: '700' }}>Gói Ưu tiên</Text>
+          </Text>
+
+          <PayButton
+            clientSecret={stripeClientSecret}
+            amount="299.000đ"
+            merchantDisplayName="Job Board"
+            onSuccess={(result) => {
+              setStripeClientSecret(null);
+              setPublishedJob(result ?? { id: 'priority' });
+              console.log(result)
+            }}
+            onError={(err) => {
+              console.error('Stripe error:', err);
+              setStripeClientSecret(null);
+            }}
+          />
+
+          <TouchableOpacity
+            style={[s.navBtnBack, { marginTop: 16, alignSelf: 'center' }]}
+            onPress={() => setStripeClientSecret(null)}
+          >
+            <Text style={s.navBtnText}>← Huỷ, quay lại</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
+
   if (publishedJob) {
     return (
-      <LinearGradient colors={['#060813', '#0C0F1E', '#111527']} style={common.container}>
-        <SafeAreaView style={[common.safeArea, { justifyContent: 'center' }]}>
+      <LinearGradient colors={['#060813', '#0C0F1E', '#111527']} style={s.container}>
+        <SafeAreaView style={[s.safeArea, { justifyContent: 'center' }]}>
           <View style={s.successContainer}>
             <View style={s.successIconRing}>
               <Ionicons name="checkmark-circle" size={54} color={COLORS.green} />
@@ -242,16 +282,16 @@ export default function PostJobScreen({ user }) {
   // ── Step 0: Thông tin cơ bản ─────────────────────────
   const renderStep0 = () => (
     <>
-      <Text style={common.inputLabel}>Tiêu đề tin tuyển dụng *</Text>
+      <Text style={s.inputLabel}>Tiêu đề tin tuyển dụng *</Text>
       <TextInput
-        style={common.input}
+        style={s.input}
         placeholder="VD: Senior React Native Developer"
         placeholderTextColor={COLORS.textMuted}
         value={form.title}
         onChangeText={(v) => update('title', v)}
       />
 
-      <Text style={common.inputLabel}>Danh mục *</Text>
+      <Text style={s.inputLabel}>Danh mục *</Text>
       <SelectBtn
         label={form.category ? form.category.name : "Chọn danh mục"}
         value={form.category?.name}
@@ -259,14 +299,14 @@ export default function PostJobScreen({ user }) {
         onPress={() => setShowCategoryModal(true)}
       />
 
-      <Text style={common.inputLabel}>Hình thức làm việc *</Text>
+      <Text style={s.inputLabel}>Hình thức làm việc *</Text>
       <TagSelector
         options={EMPLOYMENT_TYPES}
         value={form.employment_type}
         onChange={(v) => update('employment_type', v)}
       />
 
-      <Text style={common.inputLabel}>Cấp độ kinh nghiệm *</Text>
+      <Text style={s.inputLabel}>Cấp độ kinh nghiệm *</Text>
       <TagSelector
         options={EXPERIENCE_LEVELS}
         value={form.experience_level}
@@ -278,9 +318,9 @@ export default function PostJobScreen({ user }) {
   // ── Step 1: Nội dung ─────────────────────────────────
   const renderStep1 = () => (
     <>
-      <Text style={common.inputLabel}>Mô tả công việc *</Text>
+      <Text style={s.inputLabel}>Mô tả công việc *</Text>
       <TextInput
-        style={[common.input, common.textArea]}
+        style={[s.input, s.textArea]}
         placeholder="Mô tả công việc, môi trường làm việc, văn hóa công ty..."
         placeholderTextColor={COLORS.textMuted}
         value={form.description}
@@ -288,9 +328,9 @@ export default function PostJobScreen({ user }) {
         multiline
       />
 
-      <Text style={common.inputLabel}>Yêu cầu ứng viên *</Text>
+      <Text style={s.inputLabel}>Yêu cầu ứng viên *</Text>
       <TextInput
-        style={[common.input, common.textArea]}
+        style={[s.input, s.textArea]}
         placeholder="Kinh nghiệm, kỹ năng, bằng cấp cần thiết..."
         placeholderTextColor={COLORS.textMuted}
         value={form.requirements}
@@ -298,9 +338,9 @@ export default function PostJobScreen({ user }) {
         multiline
       />
 
-      <Text style={common.inputLabel}>Phúc lợi</Text>
+      <Text style={s.inputLabel}>Phúc lợi</Text>
       <TextInput
-        style={[common.input, common.textArea, { height: 90 }]}
+        style={[s.input, s.textArea, { height: 90 }]}
         placeholder="Bảo hiểm, thưởng, du lịch, đào tạo..."
         placeholderTextColor={COLORS.textMuted}
         value={form.benefit}
@@ -313,11 +353,11 @@ export default function PostJobScreen({ user }) {
   // ── Step 2: Lương & Địa chỉ ─────────────────────────
   const renderStep2 = () => (
     <>
-      <Text style={common.inputLabel}>Mức lương</Text>
+      <Text style={s.inputLabel}>Mức lương</Text>
       <View style={s.salaryRow}>
         <View style={s.salaryHalf}>
           <TextInput
-            style={common.input}
+            style={s.input}
             placeholder="Tối thiểu"
             placeholderTextColor={COLORS.textMuted}
             keyboardType="numeric"
@@ -327,7 +367,7 @@ export default function PostJobScreen({ user }) {
         </View>
         <View style={s.salaryHalf}>
           <TextInput
-            style={common.input}
+            style={s.input}
             placeholder="Tối đa"
             placeholderTextColor={COLORS.textMuted}
             keyboardType="numeric"
@@ -337,14 +377,14 @@ export default function PostJobScreen({ user }) {
         </View>
       </View>
 
-      <Text style={common.inputLabel}>Đơn vị tiền tệ</Text>
+      <Text style={s.inputLabel}>Đơn vị tiền tệ</Text>
       <TagSelector
         options={[{ value: 'VND', label: 'VNĐ' }, { value: 'USD', label: 'USD' }]}
         value={form.salary_currency}
         onChange={(v) => update('salary_currency', v || 'VND')}
       />
 
-      <Text style={[common.inputLabel, { marginTop: 4 }]}>Địa chỉ làm việc *</Text>
+      <Text style={[s.inputLabel, { marginTop: 4 }]}>Địa chỉ làm việc *</Text>
       {companyLocations.length > 0 && (
         <View style={s.addressTabRow}>
           <TouchableOpacity
@@ -401,9 +441,9 @@ export default function PostJobScreen({ user }) {
             loading={loadingDistricts}
             onPress={() => form.city && setShowDistrictModal(true)}
           />
-          <Text style={common.inputLabel}>Địa chỉ cụ thể</Text>
+          <Text style={s.inputLabel}>Địa chỉ cụ thể</Text>
           <TextInput
-            style={common.input}
+            style={s.input}
             placeholder="Số nhà, tên đường, phường/xã..."
             placeholderTextColor={COLORS.textMuted}
             value={form.street_address}
@@ -423,7 +463,7 @@ export default function PostJobScreen({ user }) {
 
     return (
       <>
-        <Text style={[common.sectionTitle, { marginBottom: 12 }]}>Xem lại tin đăng</Text>
+        <Text style={[s.sectionTitle, { marginBottom: 12 }]}>Xem lại tin đăng</Text>
         <View style={s.reviewCard}>
           {[
             { label: 'Tiêu đề', value: form.title || '—' },
@@ -440,8 +480,8 @@ export default function PostJobScreen({ user }) {
           ))}
         </View>
 
-        <Text style={[common.sectionTitle, { marginBottom: 4 }]}>Chọn gói đăng tin</Text>
-        <Text style={[common.pageSubtitle, { marginBottom: 14, marginTop: 2 }]}>
+        <Text style={[s.sectionTitle, { marginBottom: 4 }]}>Chọn gói đăng tin</Text>
+        <Text style={[s.pageSubtitle, { marginBottom: 14, marginTop: 2 }]}>
           Tin sẽ được lưu nháp rồi xuất bản theo gói bạn chọn
         </Text>
 
@@ -468,12 +508,12 @@ export default function PostJobScreen({ user }) {
   const RENDERERS = [renderStep0, renderStep1, renderStep2, renderStep3];
 
   return (
-    <LinearGradient colors={['#060813', '#0C0F1E', '#111527']} style={common.container}>
-      <SafeAreaView style={common.safeArea}>
+    <LinearGradient colors={['#060813', '#0C0F1E', '#111527']} style={s.container}>
+      <SafeAreaView style={s.safeArea}>
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView contentContainerStyle={common.scrollContainer} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-            <Text style={common.pageTitle}>Đăng tin tuyển dụng</Text>
-            <Text style={common.pageSubtitle}>Điền đầy đủ để tiếp cận ứng viên tốt hơn</Text>
+          <ScrollView contentContainerStyle={s.scrollContainer} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <Text style={s.pageTitle}>Đăng tin tuyển dụng</Text>
+            <Text style={s.pageSubtitle}>Điền đầy đủ để tiếp cận ứng viên tốt hơn</Text>
 
             <StepIndicator current={step} steps={STEPS} />
 

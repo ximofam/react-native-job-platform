@@ -2,8 +2,7 @@ import React, { useContext } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import common, { COLORS } from './styles/common';
-import s from './styles/profileStyles';
+import s, { COLORS } from '../../styles/employerScreenStyles';
 import UserContext from '../../contexts/userContext';
 
 const EMPLOYEE_SIZE_LABEL = {
@@ -49,14 +48,14 @@ export default function ProfileScreen() {
   const branchCount = company?.locations?.filter((l) => !l.is_primary).length ?? 0;
 
   return (
-    <LinearGradient colors={['#060813', '#0C0F1E', '#111527']} style={common.container}>
-      <SafeAreaView style={common.safeArea}>
+    <LinearGradient colors={['#060813', '#0C0F1E', '#111527']} style={s.container}>
+      <SafeAreaView style={s.safeArea}>
         <ScrollView
-          contentContainerStyle={common.scrollContainer}
+          contentContainerStyle={s.scrollContainer}
           showsVerticalScrollIndicator={false}
         >
-          <Text style={common.pageTitle}>Hồ sơ</Text>
-          <Text style={common.pageSubtitle}>Thông tin cá nhân & công ty</Text>
+          <Text style={s.pageTitle}>Hồ sơ</Text>
+          <Text style={s.pageSubtitle}>Thông tin cá nhân & công ty</Text>
 
           {/* Company hero banner */}
           <LinearGradient colors={['#3B1F6B', '#1E1240']} style={s.heroBanner}>
@@ -238,7 +237,7 @@ export default function ProfileScreen() {
           </View>
 
           {/* Quick actions */}
-          <Text style={[common.sectionTitle, { marginBottom: 12 }]}>Quản lý</Text>
+          <Text style={[s.sectionTitle, { marginBottom: 12 }]}>Quản lý</Text>
           <View style={s.menuCard}>
             {MENU_ITEMS.map((item, idx) => (
               <TouchableOpacity
@@ -256,7 +255,7 @@ export default function ProfileScreen() {
           </View>
 
           {/* Settings */}
-          <Text style={[common.sectionTitle, { marginBottom: 12 }]}>Cài đặt</Text>
+          <Text style={[s.sectionTitle, { marginBottom: 12 }]}>Cài đặt</Text>
           <View style={s.menuCard}>
             {SETTINGS_ITEMS.map((item, idx) => (
               <TouchableOpacity

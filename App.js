@@ -8,8 +8,8 @@ import LoginScreen from './src/screens/Auth/LoginScreen';
 import HomeScreen from './src/screens/Home/HomeScreen';
 import { UserProvider } from './src/contexts/userContext';
 import UserContext from './src/contexts/userContext';
-import JobDetailScreen from './src/screens/Job/JobDetailScreen';
 import RegisterScreen from './src/screens/Auth/RegisterScreen';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,9 +44,11 @@ function AppNavigator() {
 export default function App() {
   return (
     <UserProvider>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <StripeProvider publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLIC_KEY}>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </StripeProvider>
     </UserProvider>
   );
 }

@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
-import s from '../styles/postJobStyles';
-import { COLORS } from '../styles/common';
+import s, { COLORS } from '../../../styles/employerScreenStyles';
 
 
 export default function SelectBtn({ label, value, onPress, loading }) {

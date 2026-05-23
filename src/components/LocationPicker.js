@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Modal, FlatList, TextInput, ActivityIndicator, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getCitiesApi, getDistrictsApi } from '../../../apis/services/locationService';
+import { getCitiesApi, getDistrictsApi } from '../apis/services/locationService';
 
 
 function SelectModal({ visible, title, data, loading, onSelect, onClose }) {
@@ -95,10 +95,10 @@ export default function LocationPicker({ value, onChange }) {
   const [loadingCities, setLoadingCities] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
 
-  // Load cities khi mở modal tỉnh/thành
+
   const handleOpenCityModal = useCallback(async () => {
     setCityModalVisible(true);
-    if (cities.length > 0) return; // đã cache rồi, không gọi lại
+    if (cities.length > 0) return;
     try {
       setLoadingCities(true);
       const data = await getCitiesApi()
@@ -110,7 +110,6 @@ export default function LocationPicker({ value, onChange }) {
     }
   }, [cities.length]);
 
-  // Chọn tỉnh → load districts
   const handleSelectCity = useCallback(async (selectedCity) => {
     setCityModalVisible(false);
     setDistricts([]);
@@ -128,13 +127,11 @@ export default function LocationPicker({ value, onChange }) {
     }
   }, [onChange]);
 
-  // Chọn quận/huyện
   const handleSelectDistrict = useCallback((selectedDistrict) => {
     setDistrictModalVisible(false);
     onChange({ city, district: selectedDistrict });
   }, [city, onChange]);
 
-  // Clear location
   const handleClear = useCallback(() => {
     onChange({ city: null, district: null });
   }, [onChange]);
@@ -143,7 +140,6 @@ export default function LocationPicker({ value, onChange }) {
 
   return (
     <View>
-      {/* Trigger button */}
       <TouchableOpacity style={p.trigger} onPress={handleOpenCityModal}>
         <View style={p.triggerLeft}>
           <Ionicons name="location-outline" size={18} color={hasValue ? '#2563EB' : '#94A3B8'} />
@@ -165,7 +161,6 @@ export default function LocationPicker({ value, onChange }) {
         )}
       </TouchableOpacity>
 
-      {/* City modal */}
       <SelectModal
         visible={cityModalVisible}
         title="Chọn tỉnh / thành phố"
@@ -175,7 +170,6 @@ export default function LocationPicker({ value, onChange }) {
         onClose={() => setCityModalVisible(false)}
       />
 
-      {/* District modal */}
       <SelectModal
         visible={districtModalVisible}
         title={city ? `Quận / huyện — ${city.name}` : 'Chọn quận / huyện'}
@@ -188,7 +182,7 @@ export default function LocationPicker({ value, onChange }) {
   );
 }
 
-// ── Styles ────────────────────────────────────────────────────────────────────
+
 const p = StyleSheet.create({
   trigger: {
     flexDirection: 'row',

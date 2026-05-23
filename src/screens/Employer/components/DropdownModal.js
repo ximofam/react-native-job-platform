@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
-import s from '../styles/postJobStyles';
-import { COLORS } from '../styles/common';
+import s, { COLORS } from '../../../styles/employerScreenStyles';
 
 export default function DropdownModal({ visible, title, items, selected, onSelect, onClose, loading }) {
   return (

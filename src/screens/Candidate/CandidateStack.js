@@ -13,12 +13,11 @@ export default function CandidateStack() {
       <Stack.Screen name="JobDetail" component={JobDetailScreen}
         options={{
           title: 'Chi tiết công việc',
-          headerStyle: {
-            backgroundColor: '#020617',
-          },
+          headerStyle: { backgroundColor: '#020617' },
           headerTintColor: '#FFFFFF',
         }}
       />
+
 
       {/* <Stack.Screen name="Notifications" component={NotificationScreen}
         options={{

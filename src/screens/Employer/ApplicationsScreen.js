@@ -1,210 +1,360 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  View,
-  Text,
-  SafeAreaView,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
+  View, Text, FlatList, TouchableOpacity, Modal, ScrollView,
+  ActivityIndicator, RefreshControl, StatusBar, Animated, Alert, StyleSheet, Linking,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import common, { COLORS } from './styles/common';
-import s from './styles/applicationsStyles';
+import {
+  STATUS_CONFIG, ALL_STATUSES,
+  formatDate, formatSalary,
+  StatusBadge, InfoRow, EmptyState, sharedStyles as S,
+} from '../../utils/applicationUtils';
+import { getApplicationApi, getApplicationsApi, updateApplicationStatusApi } from '../../apis/services/applicationService';
+import s from '../../styles/applicationStyles'
 
-const MOCK_APPLICATIONS = [
-  {
-    id: 1,
-    name: 'Nguyễn Minh Khoa',
-    position: 'Frontend Developer',
-    appliedAt: '2 giờ trước',
-    status: 'new',
-    skills: ['React', 'TypeScript', 'TailwindCSS'],
-    exp: '3 năm',
-    avatarColor: '#7C3AED',
-  },
-  {
-    id: 2,
-    name: 'Trần Thị Lan Anh',
-    position: 'UI/UX Designer',
-    appliedAt: '5 giờ trước',
-    status: 'reviewing',
-    skills: ['Figma', 'Prototyping', 'Illustrator'],
-    exp: '4 năm',
-    avatarColor: '#0891B2',
-  },
-  {
-    id: 3,
-    name: 'Lê Văn Đức',
-    position: 'Backend Engineer',
-    appliedAt: '1 ngày trước',
-    status: 'interview',
-    skills: ['Node.js', 'PostgreSQL', 'Docker'],
-    exp: '5 năm',
-    avatarColor: '#059669',
-  },
-  {
-    id: 4,
-    name: 'Phạm Thị Hoa',
-    position: 'Frontend Developer',
-    appliedAt: '2 ngày trước',
-    status: 'rejected',
-    skills: ['Vue.js', 'SCSS', 'Webpack'],
-    exp: '2 năm',
-    avatarColor: '#D97706',
-  },
-];
+const EmployerCard = ({ item, onPress, fadeAnim }) => (
+  <Animated.View style={{ opacity: fadeAnim }}>
+    <TouchableOpacity style={S.card} onPress={() => onPress(item)} activeOpacity={0.75}>
+      <View style={S.cardHeader}>
+        <View style={S.cardTitleWrap}>
+          <Text style={S.cardTitle} numberOfLines={1}>{item.job_title}</Text>
+          <View style={s.candidateRow}>
+            <Ionicons name="person-outline" size={13} color="#6366F1" />
+            <Text style={s.candidateName}>
+              {item.candidate
+                ? `${item.candidate.first_name} ${item.candidate.last_name}`.trim()
+                : '—'}
+            </Text>
+          </View>
+        </View>
+        <StatusBadge status={item.status} size="sm" />
+      </View>
 
-const FILTERS = [
-  { key: 'all', label: 'Tất cả' },
-  { key: 'new', label: 'Mới' },
-  { key: 'reviewing', label: 'Đang xem' },
-  { key: 'interview', label: 'Phỏng vấn' },
-  { key: 'rejected', label: 'Từ chối' },
-];
+      <View style={S.metaItem}>
+        <Ionicons name="cash-outline" size={15} color="#10B981" />
+        <Text style={S.metaText}>{formatSalary(item.expected_salary)}</Text>
+      </View>
 
-const STATUS_CONFIG = {
-  new: { label: 'Mới', color: COLORS.blue, bg: COLORS.blueDim },
-  reviewing: { label: 'Đang xem', color: COLORS.amber, bg: COLORS.amberDim },
-  interview: { label: 'Phỏng vấn', color: COLORS.green, bg: COLORS.greenDim },
-  rejected: { label: 'Từ chối', color: COLORS.red, bg: COLORS.redDim },
+      <View style={[S.metaItem, { marginTop: 6 }]}>
+        <Ionicons name="calendar-outline" size={15} color="#3B82F6" />
+        <Text style={S.metaText}>{formatDate(item.applied_at)}</Text>
+      </View>
+
+      <View style={S.cardFooter}>
+        <View style={s.cardActionRow}>
+          <Ionicons name="create-outline" size={14} color="#6366F1" />
+          <Text style={[S.cardAction, { color: '#6366F1' }]}>Xem & Chỉnh sửa</Text>
+          <Ionicons name="chevron-forward-outline" size={14} color="#6366F1" />
+        </View>
+      </View>
+    </TouchableOpacity>
+  </Animated.View>
+);
+
+// ─── StatusEditor ──────────────────────────────────────────────────────────
+const STATUS_ICONS = {
+  PENDING: { lib: 'Ionicons', name: 'time-outline' },
+  REVIEWING: { lib: 'Ionicons', name: 'search-outline' },
+  ACCEPTED: { lib: 'Ionicons', name: 'checkmark-circle-outline' },
+  REJECTED: { lib: 'Ionicons', name: 'close-circle-outline' },
 };
 
-function ApplicationCard({ app }) {
-  const statusCfg = STATUS_CONFIG[app.status] || STATUS_CONFIG.new;
-  const initials = app.name.split(' ').map((n) => n[0]).slice(-2).join('');
-
-  return (
-    <View style={s.appCard}>
-      <View style={s.appCardHeader}>
-        <View style={[s.appAvatarFallback, { backgroundColor: app.avatarColor + '33' }]}>
-          <Text style={[s.appAvatarText, { color: app.avatarColor }]}>{initials}</Text>
-        </View>
-
-        <View style={{ flex: 1 }}>
-          <Text style={s.appName}>{app.name}</Text>
-          <Text style={s.appPosition}>{app.position} · {app.exp}</Text>
-          <Text style={s.appDate}>{app.appliedAt}</Text>
-        </View>
-
-        <View style={[s.statusBadge, { backgroundColor: statusCfg.bg }]}>
-          <Text style={[s.statusText, { color: statusCfg.color }]}>{statusCfg.label}</Text>
-        </View>
-      </View>
-
-      <View style={s.skillRow}>
-        {app.skills.map((skill) => (
-          <View key={skill} style={s.skillChip}>
-            <Text style={s.skillChipText}>{skill}</Text>
-          </View>
-        ))}
-      </View>
-
-      <View style={s.actionRow}>
-        <TouchableOpacity
-          style={[s.actionBtn, { backgroundColor: COLORS.purpleDim, borderWidth: 1, borderColor: COLORS.borderHigh }]}
-          activeOpacity={0.75}
-        >
-          <Ionicons name="document-text-outline" size={14} color={COLORS.purple} />
-          <Text style={[s.actionBtnText, { color: COLORS.purple }]}>Xem CV</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[s.actionBtn, { backgroundColor: COLORS.greenDim, borderWidth: 1, borderColor: 'rgba(52,211,153,0.25)' }]}
-          activeOpacity={0.75}
-        >
-          <Ionicons name="calendar-outline" size={14} color={COLORS.green} />
-          <Text style={[s.actionBtnText, { color: COLORS.green }]}>Hẹn phỏng vấn</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[s.actionBtn, { flex: 0, paddingHorizontal: 12, backgroundColor: COLORS.redDim, borderWidth: 1, borderColor: 'rgba(248,113,113,0.2)' }]}
-          activeOpacity={0.75}
-        >
-          <Ionicons name="close-outline" size={16} color={COLORS.red} />
-        </TouchableOpacity>
-      </View>
+const StatusEditor = ({ selectedStatus, onSelect }) => (
+  <View style={s.editorSection}>
+    <View style={s.editorLabelRow}>
+      <Ionicons name="create-outline" size={16} color="#0F172A" />
+      <Text style={s.editorLabel}>Cập nhật trạng thái</Text>
     </View>
-  );
-}
+    <View style={s.statusGrid}>
+      {ALL_STATUSES.map((s) => {
+        const cfg = STATUS_CONFIG[s];
+        const iconCfg = STATUS_ICONS[s];
+        const isSelected = selectedStatus === s;
+        return (
+          <TouchableOpacity
+            key={s}
+            style={[s.statusOption, { borderColor: cfg.color }, isSelected && { backgroundColor: cfg.bg }]}
+            onPress={() => onSelect(s)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name={iconCfg.name} size={16} color={cfg.color} />
+            <Text style={[s.statusOptionLabel, { color: cfg.color }]}>{cfg.label}</Text>
+            {isSelected && <View style={[s.selectedDot, { backgroundColor: cfg.color }]} />}
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  </View>
+);
 
-export default function ApplicationsScreen() {
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [search, setSearch] = useState('');
+// ─── EmployerDetailModal ───────────────────────────────────────────────────
+const EmployerDetailModal = ({ visible, application, onClose, onUpdateStatus }) => {
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [updating, setUpdating] = useState(false);
+  const slideAnim = useRef(new Animated.Value(600)).current;
 
-  const filtered = MOCK_APPLICATIONS.filter((app) => {
-    const matchFilter = activeFilter === 'all' || app.status === activeFilter;
-    const matchSearch =
-      search.trim() === '' ||
-      app.name.toLowerCase().includes(search.toLowerCase()) ||
-      app.position.toLowerCase().includes(search.toLowerCase());
-    return matchFilter && matchSearch;
-  });
+  useEffect(() => {
+    if (visible) setSelectedStatus(application?.status || null);
+    Animated.spring(slideAnim, {
+      toValue: visible ? 0 : 600,
+      useNativeDriver: true,
+      tension: 65,
+      friction: 11,
+    }).start();
+  }, [visible]);
+
+  const handleUpdate = async () => {
+    if (!selectedStatus || selectedStatus === application?.status) return;
+    setUpdating(true);
+    try {
+      await updateApplicationStatusApi(application.id, selectedStatus);
+      onUpdateStatus(application.id, selectedStatus);
+      Alert.alert('Thành công', `Đã cập nhật thành "${STATUS_CONFIG[selectedStatus].label}"`);
+      onClose();
+    } catch {
+      Alert.alert('Lỗi', 'Không thể cập nhật trạng thái. Thử lại sau.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const candidateName = application
+    ? `${application.candidate?.first_name ?? ''} ${application.candidate?.last_name ?? ''}`.trim()
+    : '';
+  const candidateId = application?.candidate?.id;
+  const cvUrl = application?.cv_file_url;
+
+  const handleOpenCV = async () => {
+    if (!cvUrl) return;
+    const supported = await Linking.canOpenURL(cvUrl);
+    if (supported) {
+      await Linking.openURL(cvUrl);
+    } else {
+      Alert.alert('Lỗi', 'Không thể mở file CV.');
+    }
+  };
+
+  if (!application) return null;
+  const cfg = STATUS_CONFIG[application.status];
+  const hasChanged = selectedStatus && selectedStatus !== application.status;
 
   return (
-    <LinearGradient colors={['#060813', '#0C0F1E', '#111527']} style={common.container}>
-      <SafeAreaView style={common.safeArea}>
-        <ScrollView
-          contentContainerStyle={common.scrollContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          <Text style={common.pageTitle}>Hồ sơ ứng viên</Text>
-          <Text style={common.pageSubtitle}>{MOCK_APPLICATIONS.length} ứng viên đã nộp hồ sơ</Text>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={S.overlay}>
+        <TouchableOpacity style={{ flex: 1 }} onPress={onClose} />
+        <Animated.View style={[S.sheet, { transform: [{ translateY: slideAnim }] }]}>
+          <View style={S.sheetHandle} />
 
-          {/* Search */}
-          <View style={s.searchBar}>
-            <Ionicons name="search-outline" size={18} color={COLORS.textMuted} />
-            <TextInput
-              style={s.searchInput}
-              placeholder="Tìm theo tên, vị trí..."
-              placeholderTextColor={COLORS.textMuted}
-              value={search}
-              onChangeText={setSearch}
-            />
-            {search.length > 0 && (
-              <TouchableOpacity onPress={() => setSearch('')}>
-                <Ionicons name="close-circle" size={18} color={COLORS.textMuted} />
+          <View style={S.sheetHeader}>
+            <Text style={S.sheetTitle}>Chi tiết & Chỉnh sửa</Text>
+            <TouchableOpacity onPress={onClose} style={S.closeBtn}>
+              <Ionicons name="close" size={16} color="#64748B" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Status banner */}
+            <View style={[S.statusBanner, { backgroundColor: cfg?.bg }]}>
+              <Ionicons name={STATUS_ICONS[application.status]?.name} size={18} color={cfg?.color} />
+              <Text style={[S.statusBannerText, { color: cfg?.color, marginLeft: 8 }]}>{cfg?.label}</Text>
+            </View>
+
+            {/* Info rows */}
+            <View style={S.infoSection}>
+              <InfoRow icon={<Ionicons name="briefcase-outline" size={18} color="#6366F1" />} label="Vị trí" value={application.job_title} />
+              <InfoRow icon={<Ionicons name="person-outline" size={18} color="#6366F1" />} label="Ứng viên" value={candidateName} />
+              <InfoRow icon={<Ionicons name="card-outline" size={18} color="#6366F1" />} label="ID ứng viên" value={`#${candidateId}`} />
+              <InfoRow icon={<Ionicons name="cash-outline" size={18} color="#10B981" />} label="Lương kỳ vọng" value={formatSalary(application.expected_salary)} />
+              <InfoRow icon={<Ionicons name="calendar-outline" size={18} color="#3B82F6" />} label="Ngày ứng tuyển" value={formatDate(application.applied_at)} />
+              <InfoRow icon={<Ionicons name="document-text-outline" size={18} color="#F59E0B" />} label="Mã đơn" value={`#${application.id}`} />
+            </View>
+
+            {/* CV button */}
+            {cvUrl && (
+              <TouchableOpacity style={s.cvBtn} onPress={handleOpenCV} activeOpacity={0.8}>
+                <View style={s.cvBtnIconWrap}>
+                  <Ionicons name="document-attach-outline" size={24} color="#6366F1" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.cvBtnTitle}>Xem CV ứng viên</Text>
+                  <Text style={s.cvBtnSub}>Mở file PDF</Text>
+                </View>
+                <Ionicons name="open-outline" size={18} color="#6366F1" />
               </TouchableOpacity>
             )}
-          </View>
 
-          {/* Filters */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ marginBottom: 18, marginHorizontal: -18 }}
-            contentContainerStyle={{ paddingHorizontal: 18, gap: 8 }}
-          >
-            {FILTERS.map((f) => {
-              const active = activeFilter === f.key;
-              return (
-                <TouchableOpacity
-                  key={f.key}
-                  style={[s.filterChip, active && s.filterChipActive]}
-                  onPress={() => setActiveFilter(f.key)}
-                  activeOpacity={0.75}
-                >
-                  <Text style={[s.filterChipText, active && s.filterChipTextActive]}>
-                    {f.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
+            <StatusEditor
+              currentStatus={application.status}
+              selectedStatus={selectedStatus}
+              onSelect={setSelectedStatus}
+            />
+
+            <TouchableOpacity
+              style={[s.updateBtn, (!hasChanged || updating) && s.updateBtnDisabled]}
+              onPress={handleUpdate}
+              disabled={!hasChanged || updating}
+              activeOpacity={0.8}
+            >
+              {updating ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <View style={s.updateBtnInner}>
+                  <Ionicons name="save-outline" size={18} color="#fff" />
+                  <Text style={s.updateBtnText}>Lưu thay đổi</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            <View style={{ height: 32 }} />
           </ScrollView>
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+};
 
-          {/* List */}
-          {filtered.length === 0 ? (
-            <View style={{ alignItems: 'center', paddingTop: 40 }}>
-              <Ionicons name="folder-open-outline" size={48} color={COLORS.textMuted} />
-              <Text style={{ color: COLORS.textMuted, marginTop: 12, fontSize: 14 }}>
-                Không có ứng viên phù hợp
+// ─── EmployerApplicationScreen ─────────────────────────────────────────────
+export default function EmployerApplicationScreen() {
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState('ALL');
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const fetchList = useCallback(async (isRefresh = false) => {
+    isRefresh ? setRefreshing(true) : setLoading(true);
+    try {
+      const res = await getApplicationsApi();
+      setApplications(res);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
+    } catch {
+      Alert.alert('Lỗi', 'Không thể tải danh sách đơn ứng tuyển.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchList(); }, []);
+
+  const handleCardPress = async (item) => {
+    setDetailLoading(true);
+    setModalVisible(true);
+    try {
+      const res = await getApplicationApi(item.id);
+      setSelectedApp(res);
+    } catch {
+      Alert.alert('Lỗi', 'Không thể tải chi tiết đơn.');
+      setModalVisible(false);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleUpdateStatus = (id, newStatus) => {
+    setApplications((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
+    );
+  };
+
+  const filtered = filterStatus === 'ALL'
+    ? applications
+    : applications.filter((a) => a.status === filterStatus);
+
+  return (
+    <View style={S.screen}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
+
+      {/* Header */}
+      <View style={S.header}>
+        <View>
+          <Text style={S.headerTitle}>Quản lý đơn ứng tuyển</Text>
+          <View style={s.headerSubRow}>
+            <Ionicons name="business-outline" size={13} color="#64748B" />
+            <Text style={S.headerSub}>Nhà tuyển dụng • {filtered.length} đơn</Text>
+          </View>
+        </View>
+        <View style={[S.roleBadge, S.roleBadgeEmployer]}>
+          <Text style={S.roleBadgeText}>EMPLOYER</Text>
+        </View>
+      </View>
+
+      {/* Filter tabs */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={S.filterBar}
+        contentContainerStyle={S.filterBarContent}
+      >
+        {['ALL', ...ALL_STATUSES].map((f) => {
+          const cfg = f === 'ALL' ? null : STATUS_CONFIG[f];
+          const active = filterStatus === f;
+          return (
+            <TouchableOpacity
+              key={f}
+              style={[S.filterTab, active && S.filterTabActive, active && cfg && { borderColor: cfg.color, backgroundColor: cfg.bg }]}
+              onPress={() => setFilterStatus(f)}
+              activeOpacity={0.7}
+            >
+              {f !== 'ALL' && (
+                <Ionicons
+                  name={STATUS_ICONS[f]?.name}
+                  size={13}
+                  color={active ? cfg.color : '#64748B'}
+                />
+              )}
+              {f === 'ALL' && <Ionicons name="list-outline" size={13} color={active ? '#6366F1' : '#64748B'} />}
+              <Text style={[S.filterTabText, active && cfg && { color: cfg.color }, active && f === 'ALL' && { color: '#6366F1' }]}>
+                {f === 'ALL' ? ' Tất cả' : ` ${cfg.label}`}
               </Text>
-            </View>
-          ) : (
-            filtered.map((app) => <ApplicationCard key={app.id} app={app} />)
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+
+      {/* List */}
+      {loading ? (
+        <View style={S.loadingWrap}>
+          <ActivityIndicator size="large" color="#6366F1" />
+          <Text style={S.loadingText}>Đang tải...</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => (
+            <EmployerCard item={item} onPress={handleCardPress} fadeAnim={fadeAnim} />
           )}
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+          contentContainerStyle={S.listContent}
+          ListEmptyComponent={<EmptyState />}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={() => fetchList(true)} tintColor="#6366F1" colors={['#6366F1']} />
+          }
+          showsVerticalScrollIndicator={false}
+        />
+      )}
+
+      {/* Detail loading overlay */}
+      {detailLoading && modalVisible && (
+        <Modal visible transparent>
+          <View style={[S.overlay, { justifyContent: 'center', alignItems: 'center' }]}>
+            <View style={S.detailLoader}>
+              <ActivityIndicator size="large" color="#6366F1" />
+              <Text style={S.loadingText}>Đang tải chi tiết...</Text>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      <EmployerDetailModal
+        visible={modalVisible && !detailLoading}
+        application={selectedApp}
+        onClose={() => { setModalVisible(false); setSelectedApp(null); }}
+        onUpdateStatus={handleUpdateStatus}
+      />
+    </View>
   );
 }

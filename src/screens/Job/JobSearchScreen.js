@@ -2,10 +2,10 @@ import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, TextInput, FlatList, ActivityIndicator, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import s from './styles/jobSearchStyles';
-import LocationPicker from './components/LocationPicker';
+import s from '../../styles/jobStyles';
+import LocationPicker from '../../components/LocationPicker';
 import { loadMoreJobsApi, searchJobsApi } from '../../apis/services/jobService';
-import JobCard from './components/JobCard';
+import JobCard from '../../components/JobCard';
 
 const FILTERS = ['Tất cả', 'Full-time', 'Part-time', 'Remote'];
 
@@ -60,7 +60,6 @@ export default function JobSearchScreen() {
 
   const currentParams = useRef({});
 
-  // ── Build query params ──────────────────────────────────────────────────────
   const buildParams = useCallback((filter, loc, q) => {
     const params = {};
     if (q.trim()) params.search = q.trim();
@@ -70,7 +69,7 @@ export default function JobSearchScreen() {
     return params;
   }, []);
 
-  // ── First search ────────────────────────────────────────────────────────────
+
   const handleSearch = useCallback(async () => {
     const params = buildParams(activeFilter, location, query);
     currentParams.current = params;
@@ -81,7 +80,6 @@ export default function JobSearchScreen() {
       setHasSearched(true);
 
       const res = await searchJobsApi(params);
-      // Thêm field saved client-side
       const mapped = (res.results ?? []).map((j) => ({ ...j, saved: false }));
       setJobs(mapped);
       setNextCursor(res.next ?? null);
@@ -94,7 +92,7 @@ export default function JobSearchScreen() {
     }
   }, [activeFilter, location, query, buildParams]);
 
-  // ── Load more (cursor pagination) ──────────────────────────────────────────
+
   const handleLoadMore = useCallback(async () => {
     if (!nextCursor || loadingMore) return;
 
@@ -111,10 +109,9 @@ export default function JobSearchScreen() {
     }
   }, [nextCursor, loadingMore]);
 
-  // ── Filter chip change ──────────────────────────────────────────────────────
+
   const handleFilterChange = useCallback((filter) => {
     setActiveFilter(filter);
-    // Tự động search lại nếu đã search rồi
     if (!hasSearched) return;
     const params = buildParams(filter, location, query);
     currentParams.current = params;
@@ -150,7 +147,6 @@ export default function JobSearchScreen() {
     setLocation(newLoc);
   }, []);
 
-  // ── Footer: nút Xem thêm ───────────────────────────────────────────────────
   const renderFooter = () => {
     if (loadingMore) {
       return (

@@ -3,7 +3,7 @@ import { View, Text, SafeAreaView, TouchableOpacity, ScrollView, Image } from 'r
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import UserContext from '../../contexts/userContext';
-import s from './styles/profileStyles';
+import s from '../../styles/candidateScreenStyles';
 import * as DocumentPicker from 'expo-document-picker';
 import { uploadCvApi } from '../../apis/services/userService';
 
