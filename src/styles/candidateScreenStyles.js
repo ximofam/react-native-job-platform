@@ -153,6 +153,33 @@ export default StyleSheet.create({
     borderWidth: 2,
     borderColor: '#0F172A',
   },
+  uploadCvBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1E1E1E',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
+    gap: 8,
+  },
+
+  uploadCvText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
   profileName: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', marginBottom: 4 },
   profileEmail: { color: '#94A3B8', fontSize: 14 },
 

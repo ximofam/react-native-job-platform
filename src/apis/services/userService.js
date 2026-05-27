@@ -15,3 +15,9 @@ export const addExperienceApi = (data) => {
 export const uploadCvApi = (data) => {
   return authAxios.postForm('/cvs/', data)
 }
+
+export const uploadAvatarApi = async (imageFile) => {
+  return authAxios.patchForm('/users/me/upload-avatar/', {
+    avatar: imageFile
+  });
+};

@@ -1,45 +1,34 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import JobSearchScreen from '../Job/JobSearchScreen';
 import ProfileScreen from './ProfileScreen';
-import { TouchableOpacity, View } from 'react-native';
 import CandidateApplicationScreen from './ApplicationScreen';
+import JobStack from '../Job/JobStack';
+import NotificationBell from '../../components/NotificationBell';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
 
 const Tab = createBottomTabNavigator();
 
 export default function CandidateNavigator() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={({ route, navigation }) => ({
         headerStyle: { backgroundColor: '#020617' },
         headerTintColor: '#FFFFFF',
         headerTitleStyle: { fontWeight: '700' },
-        headerRight: () => (
-          <TouchableOpacity onPress={() => navigation.navigate('Notifications')} style={{ marginRight: 18, }}          >
-            <View>
-              <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
-              <View
-                style={{
-                  position: 'absolute',
-                  top: -2,
-                  right: -2,
-                  width: 10,
-                  height: 10,
-                  borderRadius: 5,
-                  backgroundColor: '#EF4444',
-                }}
-              />
-            </View>
-          </TouchableOpacity>
-        ),
+        headerShown: true,
+        headerRight: () => <NotificationBell />,
 
         tabBarStyle: {
           backgroundColor: '#0F172A',
           borderTopColor: 'rgba(255,255,255,0.08)',
           borderTopWidth: 1,
-          height: 64,
-          paddingBottom: 10,
+          height: 64 + insets.bottom,
+          paddingBottom: 10 + insets.bottom,
           paddingTop: 8,
         },
         tabBarActiveTintColor: '#3B82F6',
@@ -56,7 +45,7 @@ export default function CandidateNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Search" component={JobSearchScreen} options={{ tabBarLabel: 'Tìm việc' }} />
+      <Tab.Screen name="Search" component={JobStack} options={{ tabBarLabel: 'Tìm việc' }} />
       <Tab.Screen name="Application" component={CandidateApplicationScreen} options={{ tabBarLabel: 'Hồ sơ ứng tuyển' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Hồ sơ' }} />
     </Tab.Navigator>

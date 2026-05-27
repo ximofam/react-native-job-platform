@@ -234,7 +234,6 @@ export default function CandidateApplicationScreen() {
     <View style={S.screen}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
-      {/* Header */}
       <View style={S.header}>
         <View>
           <Text style={S.headerTitle}>Đơn ứng tuyển của tôi</Text>
@@ -248,7 +247,7 @@ export default function CandidateApplicationScreen() {
         </View>
       </View>
 
-      {/* Filter tabs */}
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -279,7 +278,7 @@ export default function CandidateApplicationScreen() {
         })}
       </ScrollView>
 
-      {/* List */}
+
       {loading ? (
         <View style={S.loadingWrap}>
           <ActivityIndicator size="large" color="#10B981" />
@@ -300,6 +299,7 @@ export default function CandidateApplicationScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
+
 
       {detailLoading && modalVisible && (
         <Modal visible transparent>

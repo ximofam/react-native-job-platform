@@ -7,7 +7,7 @@ import LocationPicker from '../../components/LocationPicker';
 import { loadMoreJobsApi, searchJobsApi } from '../../apis/services/jobService';
 import JobCard from '../../components/JobCard';
 
-const FILTERS = ['Tất cả', 'Full-time', 'Part-time', 'Remote'];
+const FILTERS = ['Tất cả', 'FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERNSHIP'];
 
 function EmptyState({ hasSearched, error }) {
   if (error) {
@@ -63,9 +63,8 @@ export default function JobSearchScreen() {
   const buildParams = useCallback((filter, loc, q) => {
     const params = {};
     if (q.trim()) params.search = q.trim();
-    if (loc.city) params.city = loc.city.id;
     if (loc.district) params.district = loc.district.id;
-    if (filter !== 'Tất cả') params.job_type = filter;
+    if (filter !== 'Tất cả') params.employment_type = filter;
     return params;
   }, []);
 

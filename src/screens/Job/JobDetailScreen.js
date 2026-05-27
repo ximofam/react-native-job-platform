@@ -160,7 +160,9 @@ export default function JobDetailScreen({ route, navigation }) {
             <Ionicons name="bookmark-outline" size={22} color="#FFFFFF" />
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.9} style={s.applyBtn} onPress={() => navigation.navigate('JobApplication')}>
+          <TouchableOpacity activeOpacity={0.9} style={s.applyBtn}
+            onPress={() => navigation.navigate('JobApplication', { jobId: job.id, jobTitle: job.title })}
+          >
             <LinearGradient colors={['#2563EB', '#3B82F6']} style={s.applyGradient}>
               <Text style={s.applyText}>Ứng tuyển ngay</Text>
             </LinearGradient>

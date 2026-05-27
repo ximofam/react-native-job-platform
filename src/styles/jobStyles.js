@@ -1,21 +1,22 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
-  safeArea: {
-    flex: 1,
-  },
+  fill: { flex: 1 },
+  container: { flex: 1 },
+  safeArea: { flex: 1 },
+  center: { justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
 
   header: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1E293B',
   },
+  backIcon: { width: 36, height: 36, justifyContent: 'center' },
+  headerTitle: { flex: 1, textAlign: 'center', color: '#F1F5F9', fontSize: 16, fontWeight: '600' },
 
   backButton: {
     width: 44,
@@ -25,7 +26,6 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   bookmarkButton: {
     width: 44,
     height: 44,
@@ -35,9 +35,30 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
 
-  scrollContent: {
-    paddingHorizontal: 24,
-    paddingBottom: 140,
+  scroll: { paddingHorizontal: 16, paddingTop: 20 },
+  scrollContent: { paddingHorizontal: 24, paddingBottom: 140 },
+  scrollContainer: { paddingHorizontal: 24, paddingBottom: 32 },
+
+  jobPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: '#1E3A5F',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
+    marginBottom: 20,
+  },
+  jobPillText: { color: '#93C5FD', fontSize: 13, fontWeight: '500', maxWidth: 260 },
+
+  card: {
+    backgroundColor: '#0F172A',
+    borderWidth: 1,
+    borderColor: '#1E293B',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
   },
 
   companyCard: {
@@ -47,14 +68,12 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-
   companyLogo: {
     width: 74,
     height: 74,
     borderRadius: 22,
     marginBottom: 18,
   },
-
   companyLogoFallback: {
     width: 74,
     height: 74,
@@ -64,13 +83,7 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginBottom: 18,
   },
-
-  companyLogoText: {
-    color: '#FFFFFF',
-    fontSize: 28,
-    fontWeight: '800',
-  },
-
+  companyLogoText: { color: '#FFFFFF', fontSize: 28, fontWeight: '800' },
   jobTitle: {
     color: '#FFFFFF',
     fontSize: 24,
@@ -78,20 +91,13 @@ export default StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
-
-  companyName: {
-    color: '#94A3B8',
-    fontSize: 15,
-    marginBottom: 18,
-  },
-
+  companyName: { color: '#94A3B8', fontSize: 15, marginBottom: 18 },
   metaContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: 10,
   },
-
   metaBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -100,13 +106,7 @@ export default StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 14,
   },
-
-  metaText: {
-    color: '#E2E8F0',
-    marginLeft: 6,
-    fontWeight: '600',
-    fontSize: 13,
-  },
+  metaText: { color: '#E2E8F0', marginLeft: 6, fontWeight: '600', fontSize: 13 },
 
   section: {
     backgroundColor: '#111827',
@@ -114,37 +114,82 @@ export default StyleSheet.create({
     padding: 22,
     marginBottom: 18,
   },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 18 },
+  sectionTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '700', marginLeft: 10 },
+  infoRow: { flexDirection: 'row', marginBottom: 14 },
+  infoText: { color: '#CBD5E1', marginLeft: 10, flex: 1, lineHeight: 22 },
+  descriptionText: { color: '#CBD5E1', lineHeight: 26, fontSize: 15 },
 
-  sectionHeader: {
+  labelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 14 },
+  label: { color: '#E2E8F0', fontSize: 14, fontWeight: '600' },
+
+  inputWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 18,
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#334155',
+    paddingHorizontal: 14,
   },
+  input: { flex: 1, color: '#F1F5F9', fontSize: 15, paddingVertical: 14 },
+  inputSuffix: { color: '#64748B', fontSize: 13, fontWeight: '500' },
+  salaryHint: { color: '#22C55E', fontSize: 12, marginTop: 8, marginLeft: 2 },
 
-  sectionTitle: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
-    marginLeft: 10,
-  },
+  cvList: { gap: 10 },
+  cvLoadingWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8 },
+  cvLoadingText: { color: '#64748B', fontSize: 13 },
+  cvErrorWrap: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
+  cvErrorText: { color: '#EF4444', fontSize: 13 },
+  cvEmptyText: { color: '#64748B', fontSize: 13 },
 
-  infoRow: {
+  cvCard: {
     flexDirection: 'row',
-    marginBottom: 14,
+    alignItems: 'center',
+    backgroundColor: '#1E293B',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#334155',
+    padding: 12,
+    gap: 12,
   },
+  cvCardActive: { borderColor: '#3B82F6', backgroundColor: '#172554' },
+  cvIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 10,
+    backgroundColor: '#334155',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cvIconWrapActive: { backgroundColor: '#2563EB' },
+  cvInfo: { flex: 1 },
+  cvTitle: { color: '#94A3B8', fontSize: 14, fontWeight: '500', marginBottom: 2 },
+  cvTitleActive: { color: '#F1F5F9' },
+  cvMeta: { color: '#475569', fontSize: 12 },
+  checkCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: '#334155',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkCircleActive: { backgroundColor: '#2563EB', borderColor: '#2563EB' },
 
-  infoText: {
-    color: '#CBD5E1',
-    marginLeft: 10,
-    flex: 1,
-    lineHeight: 22,
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#450A0A',
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#7F1D1D',
+    marginBottom: 8,
   },
-
-  descriptionText: {
-    color: '#CBD5E1',
-    lineHeight: 26,
-    fontSize: 15,
-  },
+  errorBannerText: { color: '#FCA5A5', fontSize: 13, flex: 1 },
 
   bottomBar: {
     position: 'absolute',
@@ -153,11 +198,21 @@ export default StyleSheet.create({
     right: 0,
     backgroundColor: '#020617',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.08)',
+    borderTopColor: '#1E293B',
     flexDirection: 'row',
-    paddingHorizontal: 24,
-    paddingVertical: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
+
+  submitBtn: { borderRadius: 14, overflow: 'hidden' },
+  submitGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    gap: 8,
+  },
+  submitText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
 
   saveBtn: {
     width: 58,
@@ -168,33 +223,11 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginRight: 14,
   },
+  applyBtn: { flex: 1 },
+  applyGradient: { height: 58, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
+  applyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
 
-  applyBtn: {
-    flex: 1,
-  },
-
-  applyGradient: {
-    height: 58,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  applyText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-
-  scrollContainer: {
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-  },
-
-  searchWrapper: {
-    marginBottom: 10,
-  },
-
+  searchWrapper: { marginBottom: 10 },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -203,14 +236,7 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
     height: 56,
   },
-
-  searchInput: {
-    flex: 1,
-    marginLeft: 10,
-    color: '#0F172A',
-    fontSize: 15,
-  },
-
+  searchInput: { flex: 1, marginLeft: 10, color: '#0F172A', fontSize: 15 },
   searchBtn: {
     backgroundColor: '#2563EB',
     borderRadius: 12,
@@ -218,43 +244,19 @@ export default StyleSheet.create({
     paddingVertical: 10,
     marginLeft: 10,
   },
+  searchBtnText: { color: '#FFFFFF', fontWeight: '700', fontSize: 14 },
 
-  searchBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-
-  locationRow: {
-    marginBottom: 10,
-  },
-
-  filterRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 20,
-  },
-
+  locationRow: { marginBottom: 10 },
+  filterRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
   chip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.08)',
   },
-
-  chipActive: {
-    backgroundColor: '#2563EB',
-  },
-
-  chipText: {
-    color: '#94A3B8',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-
-  chipTextActive: {
-    color: '#FFFFFF',
-  },
+  chipActive: { backgroundColor: '#2563EB' },
+  chipText: { color: '#94A3B8', fontSize: 13, fontWeight: '600' },
+  chipTextActive: { color: '#FFFFFF' },
 
   loadingContainer: {
     flex: 1,
@@ -262,18 +264,12 @@ export default StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-
-  loadingText: {
-    color: '#64748B',
-    fontSize: 14,
-  },
-
+  loadingText: { color: '#64748B', fontSize: 14 },
   emptyContainer: {
     alignItems: 'center',
     paddingTop: 60,
     paddingHorizontal: 32,
   },
-
   emptyIconWrapper: {
     width: 96,
     height: 96,
@@ -283,7 +279,6 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-
   emptyTitle: {
     color: '#FFFFFF',
     fontSize: 20,
@@ -291,25 +286,10 @@ export default StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
+  emptySub: { color: '#64748B', fontSize: 14, lineHeight: 22, textAlign: 'center' },
 
-  emptySub: {
-    color: '#64748B',
-    fontSize: 14,
-    lineHeight: 22,
-    textAlign: 'center',
-  },
-
-  resultCount: {
-    color: '#64748B',
-    fontSize: 13,
-    marginBottom: 16,
-  },
-
-  loadMoreWrapper: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-
+  resultCount: { color: '#64748B', fontSize: 13, marginBottom: 16 },
+  loadMoreWrapper: { paddingVertical: 20, alignItems: 'center' },
   loadMoreBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -324,17 +304,31 @@ export default StyleSheet.create({
     borderColor: 'rgba(59,130,246,0.3)',
     alignSelf: 'center',
   },
+  loadMoreText: { color: '#3B82F6', fontSize: 14, fontWeight: '700' },
+  endText: { color: '#475569', fontSize: 13, textAlign: 'center', paddingVertical: 20 },
 
-  loadMoreText: {
-    color: '#3B82F6',
+  successIconWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#052E16',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  successTitle: { color: '#F1F5F9', fontSize: 22, fontWeight: '700', marginBottom: 8 },
+  successSub: {
+    color: '#94A3B8',
     fontSize: 14,
-    fontWeight: '700',
-  },
-
-  endText: {
-    color: '#475569',
-    fontSize: 13,
     textAlign: 'center',
-    paddingVertical: 20,
+    lineHeight: 22,
+    marginBottom: 32,
   },
+  backBtn: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  backBtnText: { color: '#F1F5F9', fontSize: 15, fontWeight: '600' },
 });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { View, StyleSheet, Platform } from 'react-native';
@@ -7,6 +7,9 @@ import { BlurView } from 'expo-blur';
 import PostJobScreen from './PostJobScreen';
 import ApplicationsScreen from './ApplicationsScreen';
 import ProfileScreen from './ProfileScreen';
+import { InsetsContext } from '../../../App';
+import NotificationBell from '../../components/NotificationBell';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,15 +22,29 @@ function TabIcon({ name, focused, color }) {
 }
 
 export default function EmployerNavigator() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false,
         tabBarShowLabel: true,
         tabBarActiveTintColor: '#A78BFA',
         tabBarInactiveTintColor: '#64748B',
         tabBarLabelStyle: styles.tabLabel,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: {
+          position: 'absolute',
+          borderTopWidth: 0,
+          elevation: 0,
+          height: Platform.OS === 'ios' ? 85 : 65 + insets.bottom,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 10 + insets.bottom,
+          paddingTop: 10,
+          backgroundColor: 'transparent',
+          borderTopColor: 'rgba(255,255,255,0.06)',
+          borderTopWidth: 1,
+        },
+        headerShown: true,
+        headerRight: () => <NotificationBell />,
+
         tabBarBackground: () => (
           Platform.OS === 'ios' ? (
             <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
@@ -77,17 +94,6 @@ export default function EmployerNavigator() {
 }
 
 const styles = StyleSheet.create({
-  tabBar: {
-    position: 'absolute',
-    borderTopWidth: 0,
-    elevation: 0,
-    height: Platform.OS === 'ios' ? 85 : 65,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 10,
-    paddingTop: 10,
-    backgroundColor: 'transparent',
-    borderTopColor: 'rgba(255,255,255,0.06)',
-    borderTopWidth: 1,
-  },
   tabBarAndroid: {
     backgroundColor: 'rgba(9, 11, 22, 0.97)',
   },

@@ -1,5 +1,7 @@
 import React, { createContext, useEffect, useState, } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logoutApi } from '../apis/services/authService';
+import { getCurrentUserApi } from '../apis/services/userService';
 
 const UserContext = createContext();
 const USER_STORAGE_KEY = 'user';
@@ -35,23 +37,14 @@ export function UserProvider({ children }) {
     }
   };
 
-  const updateUser = async (partialData) => {
-    try {
-      const updatedUser = {
-        ...user,
-        ...partialData,
-      };
-
-      await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUser));
-      setUserState(updatedUser);
-    } catch (error) {
-      console.log(error);
-    }
+  const updateUser = async () => {
+    const user = await getCurrentUserApi()
+    setUser(user)
   };
 
   const logout = async () => {
     try {
-      await AsyncStorage.multiRemove(['user', 'access_token', 'refresh_token',]);
+      await logoutApi()
       setUserState(null);
     } catch (error) {
       console.log(error);
