@@ -32,7 +32,7 @@ function CvCard({ cv, selected, onPress }) {
       onPress={onPress}
       style={[s.cvCard, active && s.cvCardActive]}
     >
-      {/* PDF icon */}
+
       <View style={[s.cvIconWrap, active && s.cvIconWrapActive]}>
         <Ionicons
           name="document-text-outline"
@@ -48,7 +48,7 @@ function CvCard({ cv, selected, onPress }) {
         <Text style={s.cvMeta}>PDF · CV của bạn</Text>
       </View>
 
-      {/* Check badge */}
+
       <View style={[s.checkCircle, active && s.checkCircleActive]}>
         {active && (
           <Ionicons name="checkmark" size={13} color="#FFFFFF" />

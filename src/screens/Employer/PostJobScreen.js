@@ -54,7 +54,7 @@ const PACKAGES = [
     badgeBg: COLORS.amberDim,
     badgeColor: COLORS.amber,
     title: 'Gói Ưu tiên',
-    price: '299.000đ',
+    price: '199.000đ',
     priceColor: COLORS.amber,
     features: [
       { icon: 'checkmark-circle-outline', text: 'Hiển thị ưu tiên TOP đầu' },

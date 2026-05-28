@@ -163,15 +163,12 @@ export default function ProfileScreen() {
       <SafeAreaView style={s.safeArea}>
         <ScrollView contentContainerStyle={s.scrollContainer} showsVerticalScrollIndicator={false}>
 
-          {/* Hero */}
           <View style={s.heroBg}>
-            {/* Logout button */}
             <TouchableOpacity style={s.logoutBtn} onPress={logout}>
               <Ionicons name="log-out-outline" size={16} color="#F87171" />
               <Text style={s.logoutText}>Đăng xuất</Text>
             </TouchableOpacity>
 
-            {/* Avatar */}
             <View style={s.avatarWrapper}>
               {user.avatar_url ? (
                 <Image source={{ uri: user.avatar_url }} style={s.avatar} />
@@ -199,10 +196,7 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Body */}
           <View style={s.body}>
-
-            {/* Bio */}
             <SectionCard
               icon="document-text-outline"
               iconColor="#2563EB"
@@ -217,7 +211,7 @@ export default function ProfileScreen() {
               )}
             </SectionCard>
 
-            {/* Education */}
+
             <SectionCard
               icon="school-outline"
               iconColor="#059669"
@@ -240,7 +234,7 @@ export default function ProfileScreen() {
               )}
             </SectionCard>
 
-            {/* Experience */}
+
             <SectionCard
               icon="briefcase-outline"
               iconColor="#D97706"
@@ -266,7 +260,7 @@ export default function ProfileScreen() {
         </ScrollView>
       </SafeAreaView>
 
-      {/* MODAL THÊM HỌC VẤN */}
+
       <Modal visible={modalEduVisible} animationType="slide" transparent={true}>
         <View style={modalStyles.overlay}>
           <View style={modalStyles.modalContainer}>
@@ -294,7 +288,7 @@ export default function ProfileScreen() {
         </View>
       </Modal>
 
-      {/* MODAL THÊM KINH NGHIỆM */}
+
       <Modal visible={modalExpVisible} animationType="slide" transparent={true}>
         <View style={modalStyles.overlay}>
           <View style={modalStyles.modalContainer}>

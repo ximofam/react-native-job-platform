@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, SafeAreaView, StatusBar, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { loginStyles } from './Styles';
+import { loginStyles } from '../../styles/authStyles';
 import { loginApi } from '../../apis/services/authService';
 import UserContext from '../../contexts/userContext';
 import { getCurrentUserApi } from '../../apis/services/userService';
@@ -50,7 +50,6 @@ export default function LoginScreen({ navigation }) {
               contentContainerStyle={loginStyles.scrollContainer}
               showsVerticalScrollIndicator={false}
             >
-              {/* Header */}
               <View style={loginStyles.headerContainer}>
                 <View style={loginStyles.logoContainer}>
                   <Ionicons name="briefcase" size={34} color="#FFFFFF" />
@@ -62,9 +61,8 @@ export default function LoginScreen({ navigation }) {
                 </Text>
               </View>
 
-              {/* Card */}
+
               <View style={loginStyles.card}>
-                {/* Email */}
                 <View style={loginStyles.inputWrapper}>
                   <Text style={loginStyles.label}>Username or email</Text>
 
@@ -86,7 +84,6 @@ export default function LoginScreen({ navigation }) {
                   </View>
                 </View>
 
-                {/* Password */}
                 <View style={loginStyles.inputWrapper}>
                   <Text style={loginStyles.label}>Password</Text>
 
@@ -118,14 +115,14 @@ export default function LoginScreen({ navigation }) {
                   </View>
                 </View>
 
-                {/* Forgot password */}
+
                 <TouchableOpacity style={loginStyles.forgotPasswordContainer}>
                   <Text style={loginStyles.forgotPasswordText}>
                     Forgot Password?
                   </Text>
                 </TouchableOpacity>
 
-                {/* Login Button */}
+
                 <TouchableOpacity
                   activeOpacity={0.85}
                   onPress={handleLogin}
@@ -156,14 +153,13 @@ export default function LoginScreen({ navigation }) {
                   </LinearGradient>
                 </TouchableOpacity>
 
-                {/* Divider */}
+
                 <View style={loginStyles.dividerContainer}>
                   <View style={loginStyles.divider} />
                   <Text style={loginStyles.dividerText}>OR</Text>
                   <View style={loginStyles.divider} />
                 </View>
 
-                {/* Social Login */}
                 <TouchableOpacity style={loginStyles.socialButton}>
                   <Ionicons name="logo-google" size={22} color="#EA4335" />
 
@@ -172,7 +168,7 @@ export default function LoginScreen({ navigation }) {
                   </Text>
                 </TouchableOpacity>
 
-                {/* Register */}
+
                 <View style={loginStyles.registerContainer}>
                   <Text style={loginStyles.registerText}>
                     Don't have an account?

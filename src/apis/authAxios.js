@@ -34,7 +34,7 @@ authAxios.interceptors.response.use(
       try {
         const refreshToken = await AsyncStorage.getItem('refresh_token');
 
-        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_BASE_URL}/auth/token/`, {
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_BASE_URL}auth/token/`, {
           refresh_token: refreshToken,
           grant_type: "refresh_token",
           client_id: process.env.EXPO_PUBLIC_CLIENT_ID,

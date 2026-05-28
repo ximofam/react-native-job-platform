@@ -37,7 +37,7 @@ export const NotificationProvider = ({ children }) => {
         const wsBaseUrl = process.env.EXPO_PUBLIC_GOTIFY_URL.replace(/^http/, 'ws');
         ws = new WebSocket(`${wsBaseUrl}/stream?token=${clientToken}`);
 
-        ws.onopen = () => console.log('🟢 Đã kết nối Gotify WS');
+        ws.onopen = () => console.log('Đã kết nối Gotify WS');
 
         ws.onmessage = (event) => {
           const newMessage = JSON.parse(event.data);
