@@ -7,9 +7,9 @@ import { BlurView } from 'expo-blur';
 import PostJobScreen from './PostJobScreen';
 import ApplicationsScreen from './ApplicationsScreen';
 import ProfileScreen from './ProfileScreen';
-import { InsetsContext } from '../../../App';
 import NotificationBell from '../../components/NotificationBell';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import JobManagementScreen from './JobManagementScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -76,6 +76,18 @@ export default function EmployerNavigator() {
         }}
       >
         {(props) => <ApplicationsScreen {...props} />}
+      </Tab.Screen>
+
+      <Tab.Screen
+        name="JobManagement"
+        options={{
+          tabBarLabel: 'Tin đăng',
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name={focused ? 'add-circle' : 'add-circle-outline'} focused={focused} />
+          ),
+        }}
+      >
+        {(props) => <JobManagementScreen {...props} />}
       </Tab.Screen>
 
       <Tab.Screen

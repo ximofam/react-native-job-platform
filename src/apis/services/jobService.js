@@ -36,3 +36,7 @@ export const publishPriorityJobApi = async (jobId, method) => {
     }
   })
 }
+
+export const getMyJobsApi = async () => {
+  return authAxios.get(`/jobs/my-jobs/`)
+}

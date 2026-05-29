@@ -17,8 +17,8 @@ export const loginApi = async ({ username, password }) => {
     username: username,
     password: password,
     grant_type: "password",
-    client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
-    client_secret: process.env.EXPO_PUBLIC_CLIENT_SECRET,
+    // client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
+    // client_secret: process.env.EXPO_PUBLIC_CLIENT_SECRET,
   });
 
   await AsyncStorage.setItem('access_token', response.access_token);
@@ -49,8 +49,8 @@ export const refreshTokenApi = async () => {
   const response = await publicAxios.post('/auth/token/', {
     refresh_token: refreshToken,
     grant_type: "refresh_token",
-    client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
-    client_secret: process.env.EXPO_PUBLIC_CLIENT_SECRET,
+    // client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
+    // client_secret: process.env.EXPO_PUBLIC_CLIENT_SECRET,
   });
 
   await AsyncStorage.setItem('access_token', response.access_token);
